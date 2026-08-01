@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  /// Name shown to other people in the app. Empty for accounts created before
+  /// usernames were introduced; the UI falls back to the email prefix there.
+  username    String       @default("")
+  password    String
+  /// Cases this user created.
+  cases       Case[]
+  memberships CaseMember[]
+  callVisits  CallParticipant[]
+  sessions    UserSession[]
+  createdAt   DateTime     @default(now())
+}
+
+/// One row per sign-in. Lets a user see and revoke where they are logged in.
+/// The auth JWT carries this row's id; deleting the row signs that device out
+/// (checked periodically in the jwt callback).
+model UserSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Best-effort client IP at sign-in (first x-forwarded-for hop).
+  ip         String?
+  userAgent  String?
+  /// Human label parsed from the user agent, e.g. "Windows · Chrome".
+  device     String?
+  city       String?
+  country    String?
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Grants a user access to a case. `role` is the baseline edit ceiling:
+/// "editor" edits like an owner (the original Phase 3 behaviour, kept as the
+/// default), "viewer" is read-only whether or not a call is running. During a
+/// call the host can further restrict an editor, but can never lift a viewer
+/// above their baseline — permission is baseline ∩ call override.
+model CaseMember {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "editor" | "viewer"
+  role      String   @default("editor")
+  createdAt DateTime @default(now())
+
+  @@unique([caseId, userId])
+  @@index([userId])
+}
+
+model Case {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  people      Person[]
+  connectors  Connector[]
+  groups      Group[]
+  members     CaseMember[]
+  calls       CallSession[]
+  boardVersions      BoardVersion[]
+  whiteboardVersions WhiteboardVersion[]
+  boardSnapshot      BoardSnapshot?
+  whiteboardSnapshot WhiteboardSnapshot?
+  shareLink          CaseShareLink?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([ownerId])
+}
+
+/// A public, view-only link to a case's board. One slot per case (regenerating
+/// mints a fresh token and invalidates the old URL). `expiresAt` null means the
+/// link never expires; `revokedAt` set means the owner killed it early. Both are
+/// checked on every access, so a link stops working the instant it lapses even
+/// for someone currently viewing.
+model CaseShareLink {
+  id        String    @id @default(cuid())
+  caseId    String    @unique
+  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime?
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdById String?
+}
+
+/// Serialized Yjs document for a case's investigation board.
+/// Written by the websocket server, not by the Next app.
+model BoardSnapshot {
+  id        String   @id @default(cuid())
+  caseId    String   @unique
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  yjsState  Bytes
+  updatedAt DateTime @updatedAt
+}
+
+/// One ad-hoc call on a case. Open while at least one person is connected.
+model CallSession {
+  id           String            @id @default(cuid())
+  caseId       String
+  case         Case              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  participants CallParticipant[]
+  startedAt    DateTime          @default(now())
+  endedAt      DateTime?
+
+  @@index([caseId, startedAt])
+}
+
+/// Who was on a call and when. Kept as the journalist's own record of who saw what.
+model CallParticipant {
+  id            String      @id @default(cuid())
+  callSessionId String
+  callSession   CallSession @relation(fields: [callSessionId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt      DateTime    @default(now())
+  leftAt        DateTime?
+
+  @@index([callSessionId])
+  @@index([userId])
+}
+
+/// Point-in-time board snapshot for version history. Retention is enforced in
+/// the websocket server (see PRUNE_* in versions.ts).
+model BoardVersion {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  yjsState  Bytes
+  /// "Auto-save", or a name the user typed.
+  label     String?
+  /// Null for automatic snapshots.
+  createdById String?
+  createdAt DateTime @default(now())
+
+  @@index([caseId, createdAt])
+}
+
+model WhiteboardVersion {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  yjsState  Bytes
+  label     String?
+  createdById String?
+  createdAt DateTime @default(now())
+
+  @@index([caseId, createdAt])
+}
+
+model WhiteboardSnapshot {
+  id        String   @id @default(cuid())
+  caseId    String   @unique
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  yjsState  Bytes
+  /// Human-readable fallback of the Excalidraw scene, for debugging and export.
+  sceneJson Json?
+  updatedAt DateTime @updatedAt
+}
+
+model Person {
+  id             String      @id @default(cuid())
+  caseId         String
+  case           Case        @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  name           String
+  photoUrl       String?
+  notes          String?
+  tags           String[]
+  role           String?
+  location       String?
+  source         String?
+  x              Float
+  y              Float
+  connectorsFrom Connector[] @relation("ConnectorFrom")
+  connectorsTo   Connector[] @relation("ConnectorTo")
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([caseId])
+}
+
+model Connector {
+  id     String @id @default(cuid())
+  caseId String
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  fromId String
+  from   Person @relation("ConnectorFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId   String
+  to     Person @relation("ConnectorTo", fields: [toId], references: [id], onDelete: Cascade)
+  label  String?
+  /// "confirmed" | "alleged" | "unconfirmed"
+  confidence String
+  /// "none" | "forward" | "both"
+  direction  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([caseId])
+  @@index([fromId])
+  @@index([toId])
+}
+
+model Group {
+  id     String @id @default(cuid())
+  caseId String
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  label  String
+  x      Float
+  y      Float
+  width  Float
+  height Float
+  /// Person ids. Not a foreign key, so person deletes must prune this by hand.
+  memberIds String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([caseId])
+}

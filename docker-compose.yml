@@ -1,0 +1,27 @@
+# Self-hosted LiveKit for CaseBoard calls and screen share.
+#
+#   docker compose up -d
+#
+# Dev keys live in livekit.yaml and are also read by the Next app via
+# LIVEKIT_API_KEY / LIVEKIT_API_SECRET. Generate real ones before this leaves
+# your machine — see the note in livekit.yaml.
+services:
+  livekit:
+    image: livekit/livekit-server:v1.8
+    command: --config /etc/livekit.yaml --node-ip 127.0.0.1
+    restart: unless-stopped
+    ports:
+      - "7880:7880" # HTTP + WebSocket signalling
+      - "7881:7881" # TCP fallback for WebRTC
+      - "50000-50100:50000-50100/udp" # WebRTC media
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro
+
+  # Live permission state during calls. Checked on every Yjs update, so it needs
+  # to be fast; it is deliberately not durable — permissions reset when a call ends.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save "" --appendonly no
+    ports:
+      - "6379:6379"

@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * CaseBoard design tokens.
+ *
+ * Light mode only, flat colour, neutral slate palette. Values live here as CSS
+ * variables so a future theme is a variable swap rather than a rewrite of every
+ * component.
+ */
+@layer base {
+  :root {
+    --radius-sm: 0.375rem;
+    --radius: 0.5rem;
+    --radius-lg: 0.75rem;
+
+    --header-height: 3.5rem;
+
+    /* Motion. Kept short — this is a working tool, not a showcase. */
+    --transition: 140ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-cream-100 text-stone-800 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04";
+  }
+
+  /* Consistent focus ring everywhere. */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-terracotta-500 ring-offset-2 ring-offset-cream-100;
+  }
+
+  /* Headings default to tight tracking; long-form text stays readable. */
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-terracotta-500/20;
+  }
+
+  /* Slim, neutral scrollbars so panels don't get a heavy chrome stripe. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full border-4 border-solid border-transparent bg-cream-300 bg-clip-content;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-stone-400 bg-clip-content;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---- Buttons ---------------------------------------------------------- */
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap
+           rounded-md px-3 text-sm font-medium;
+    /* 2.25rem keeps a comfortable tap target without feeling chunky. */
+    min-height: 2.25rem;
+    transition:
+      background-color var(--transition),
+      border-color var(--transition),
+      color var(--transition),
+      opacity var(--transition);
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-45;
+  }
+
+  .btn-primary {
+    @apply btn bg-terracotta-600 text-cream-50;
+  }
+  .btn-primary:not(:disabled):hover {
+    @apply bg-terracotta-700;
+  }
+
+  .btn-secondary {
+    @apply btn border border-cream-300 bg-cream-50 text-stone-700;
+  }
+  .btn-secondary:not(:disabled):hover {
+    @apply border-stone-400/40 bg-cream-200;
+  }
+
+  .btn-ghost {
+    @apply btn text-stone-600;
+  }
+  .btn-ghost:not(:disabled):hover {
+    @apply bg-cream-200 text-stone-800;
+  }
+
+  .btn-danger {
+    @apply btn bg-clay-500 text-cream-50;
+  }
+  .btn-danger:not(:disabled):hover {
+    @apply bg-clay-600;
+  }
+
+  /* Compact variant for toolbars and inline row actions. */
+  .btn-sm {
+    @apply gap-1.5 rounded px-2 text-xs;
+    min-height: 1.75rem;
+  }
+
+  .btn-lg {
+    @apply px-4 text-base;
+    min-height: 2.75rem;
+  }
+
+  /* ---- Forms ------------------------------------------------------------ */
+
+  .field {
+    @apply w-full rounded-md border border-cream-300 bg-cream-50 px-3 text-sm
+           text-stone-800 placeholder:text-stone-400;
+    /* Matches .btn height so inputs and buttons line up on one row. */
+    min-height: 2.25rem;
+    padding-block: 0.4rem;
+    transition:
+      border-color var(--transition),
+      box-shadow var(--transition);
+  }
+
+  .field:focus {
+    @apply border-terracotta-500 outline-none ring-1 ring-terracotta-500;
+  }
+
+  .field:disabled {
+    @apply cursor-not-allowed bg-cream-200 text-stone-500;
+  }
+
+  .field-error {
+    @apply border-clay-500;
+  }
+  .field-error:focus {
+    @apply border-clay-500 ring-clay-500;
+  }
+
+  textarea.field {
+    @apply leading-relaxed;
+    padding-block: 0.5rem;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-stone-500;
+  }
+
+  /* ---- Surfaces --------------------------------------------------------- */
+
+  .surface {
+    @apply rounded-lg border border-cream-300 bg-cream-50;
+  }
+
+  /* Clickable surface: lifts slightly on hover to read as interactive. */
+  .surface-interactive {
+    @apply surface;
+    transition:
+      border-color var(--transition),
+      box-shadow var(--transition),
+      transform var(--transition);
+  }
+
+  .surface-interactive:hover {
+    @apply border-stone-400/40 shadow-card;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded bg-cream-200 px-1.5 py-0.5
+           text-[11px] leading-4 text-stone-600;
+  }
+
+  .divider {
+    @apply border-t border-cream-300;
+  }
+
+  /* ---- Utilities -------------------------------------------------------- */
+
+  /* Skeleton block. Uses opacity rather than colour cycling so it stays calm. */
+  .skeleton {
+    @apply animate-pulse rounded bg-cream-300;
+  }
+
+  /* Visible only to screen readers, e.g. skip links and live regions. */
+  .sr-only-focusable:not(:focus) {
+    @apply sr-only;
+  }
+}

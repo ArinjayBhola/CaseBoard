@@ -1,0 +1,31 @@
+# LiveKit server config for local development.
+#
+# SECURITY: the key/secret below are throwaway development credentials and are
+# committed on purpose so the stack runs out of the box. Anyone who can reach
+# this server with them can join any call. Before running this anywhere other
+# than your own machine, generate a new pair and put them in .env instead:
+#
+#   docker run --rm livekit/livekit-server generate-keys
+#
+# and set LIVEKIT_API_KEY / LIVEKIT_API_SECRET to match.
+
+port: 7880
+
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 50100
+  # Fine for localhost. Behind NAT or in the cloud you need use_external_ip: true
+  # and a TURN server, or media will fail to connect.
+  use_external_ip: false
+
+keys:
+  devkey: devsecret_change_me_before_leaving_localhost
+
+logging:
+  level: info
+
+room:
+  # Calls are ad hoc: the room disappears shortly after the last person leaves.
+  empty_timeout: 60
+  departure_timeout: 20
