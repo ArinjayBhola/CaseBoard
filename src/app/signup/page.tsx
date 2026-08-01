@@ -128,7 +128,6 @@ export default function SignupPage() {
           placeholder="How people should see you"
           value={username}
           error={errors.username}
-          hint="Choose the name you want others to see."
           onChange={(e) => {
             setUsername(e.target.value);
             if (errors.username) setErrors((prev) => ({ ...prev, username: undefined }));
