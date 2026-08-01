@@ -183,7 +183,7 @@ export default function SignupPage() {
 
         <button
           type="submit"
-          className="btn-primary btn-lg w-full"
+          className="btn-primary btn-lg w-full transition-transform duration-200 hover:-translate-y-[1px]"
           disabled={busy || !canSubmit}
         >
           {busy ? (
