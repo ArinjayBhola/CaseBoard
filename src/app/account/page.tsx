@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import { DeleteAccount } from "@/components/DeleteAccount";
 import { SessionsPanel } from "@/components/SessionsPanel";
 import { TopBar } from "@/components/TopBar";
 import { Avatar } from "@/components/ui/Avatar";
@@ -75,6 +76,8 @@ export default async function AccountPage() {
         <section className="surface mt-4 p-5 sm:p-6">
           <SessionsPanel />
         </section>
+
+        <DeleteAccount />
       </main>
     </div>
   );

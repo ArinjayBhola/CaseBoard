@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckIcon, PencilIcon, XIcon } from "@/components/ui/icons";
+import { CheckIcon, PencilIcon, Spinner, XIcon } from "@/components/ui/icons";
 
 export function UsernameEditor({ initialUsername }: { initialUsername: string }) {
   const router = useRouter();
@@ -67,7 +67,7 @@ export function UsernameEditor({ initialUsername }: { initialUsername: string })
             className="field h-9 max-w-full text-lg font-semibold"
           />
           <button type="button" onClick={() => void save()} disabled={busy} aria-label="Save username" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-terracotta-600 hover:bg-terracotta-500/10">
-            <CheckIcon size={17} />
+            {busy ? <Spinner size={17} /> : <CheckIcon size={17} />}
           </button>
           <button type="button" onClick={cancel} disabled={busy} aria-label="Cancel username edit" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-stone-500 hover:bg-stone-100">
             <XIcon size={17} />

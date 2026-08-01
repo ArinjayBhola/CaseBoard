@@ -5,14 +5,6 @@ import { Logo } from "@/components/ui/Logo";
 
 export { Alert as FormAlert } from "@/components/ui/Alert";
 
-/**
- * Auth layout.
- *
- * Two columns on a large screen: the form on the left where the eye lands, and a
- * short description of what the tool is on the right. Below `lg` the right
- * column is dropped entirely rather than stacked — on a phone it would just be
- * marketing standing between the user and the password box.
- */
 export function AuthShell({
   title,
   subtitle,
@@ -28,13 +20,6 @@ export function AuthShell({
     <main className="min-h-[100dvh] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="flex min-h-[100dvh] items-center justify-center px-4 py-10 sm:px-6 lg:min-h-0">
         <div className="w-full max-w-sm">
-          <Link
-            href="/"
-            className="mb-8 inline-flex items-center gap-2 rounded-md text-stone-800"
-          >
-            <Logo size="md" />
-          </Link>
-
           <h1 className="text-xl font-semibold text-stone-800">{title}</h1>
           <p className="mt-1.5 text-sm text-stone-500">{subtitle}</p>
 
@@ -46,6 +31,10 @@ export function AuthShell({
 
       <aside className="hidden border-l border-cream-300 bg-cream-200 p-12 lg:flex lg:flex-col lg:justify-center">
         <div className="max-w-sm">
+          <div className="mb-10 inline-flex items-center gap-2 rounded-md text-stone-800">
+            <Logo size="md" />
+          </div>
+
           <h2 className="text-lg font-semibold text-stone-800">
             An investigation workspace, not a whiteboard app.
           </h2>
