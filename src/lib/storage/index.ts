@@ -1,4 +1,3 @@
-import { LocalDiskStorage } from "./local";
 import { R2Storage } from "./r2";
 import type { Storage } from "./types";
 
@@ -23,18 +22,12 @@ let instance: Storage | null = null;
 
 /**
  * Single entry point for file storage. Import this, never a concrete driver.
- *
- * Adding R2 later:
- *   case "r2": instance = new R2Storage(); break;
  */
 export function storage(): Storage {
   if (instance) return instance;
 
-  const driver = process.env.STORAGE_DRIVER ?? "local";
+  const driver = process.env.STORAGE_DRIVER ?? "r2";
   switch (driver) {
-    case "local":
-      instance = new LocalDiskStorage();
-      break;
     case "r2":
       instance = new R2Storage();
       break;

@@ -1,9 +1,7 @@
 /**
  * Storage abstraction.
  *
- * Calling code only ever sees this interface. Phase 1 ships LocalDiskStorage
- * (writes under ./uploads). Swapping to Cloudflare R2 later means adding an
- * R2Storage implementation and changing STORAGE_DRIVER — no call sites change.
+ * Calling code only ever sees this interface. The implementation uses Cloudflare R2.
  */
 
 export type PutInput = {
@@ -20,7 +18,7 @@ export type PutInput = {
 export type PutResult = {
   /** Driver-internal key, e.g. "people/abc123.png". Store this if you need to delete later. */
   key: string;
-  /** URL the browser can load. Local driver returns an app route; R2 will return a CDN URL. */
+  /** URL the browser can load. Returns a CDN URL. */
   url: string;
 };
 

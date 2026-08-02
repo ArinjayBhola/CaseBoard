@@ -9,6 +9,3 @@ build/
 next-env.d.ts
 .DS_Store
 
-# Local file storage (Phase 1). Swapped for R2 later.
-uploads/*
-!uploads/.gitkeep

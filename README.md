@@ -123,11 +123,7 @@ Moving to Express means:
 
 ### Cloudflare R2 storage
 
-Uploads use `src/lib/storage/r2.ts` when `STORAGE_DRIVER=r2`. Configure an R2
-bucket and a public custom domain (or R2.dev URL) in the environment above. Image
-and PDF uploads are stored under owner-scoped keys, and returned URLs are the
-configured public URL. Set `STORAGE_DRIVER=local` with `LOCAL_UPLOAD_DIR` only for
-local development without R2.
+Uploads use `src/lib/storage/r2.ts`. Configure an R2 bucket and a public custom domain (or R2.dev URL) in the environment above. Image and PDF uploads are stored under owner-scoped keys, and returned URLs are the configured public URL.
 
 Photos are stored outside `public/`, so `/api/files/[...key]` serves them and
 requires a session.

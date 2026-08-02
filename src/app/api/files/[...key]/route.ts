@@ -6,18 +6,14 @@ import { canAccess } from "@/server/services/cases";
 type Params = { params: { key: string[] } };
 
 /**
- * Serves locally-stored uploads. Files live outside /public so they are not
- * blanket-public; when storage moves to R2 this route stops being used because
- * PutResult.url will point at the CDN instead.
+ * Serves stored uploads via the storage adapter (currently R2).
+ * Files are not served directly from CDN to allow for authorization checks.
  *
  * Authorisation has two paths:
  *  1. Your own uploads (`users/<you>/…`) — always allowed. This also covers a
  *     photo just uploaded but not yet attached to a person card.
  *  2. A photo attached to a person on a case you can access — so co-members of a
- *     shared case see each other's photos and the case thumbnail, which the
- *     stricter owner-only check used to 404. The file's owner must *also* have
- *     access to that case, so a member can't attach a photoUrl pointing at an
- *     outsider's file and have us serve it back to them.
+ *     shared case see each other's photos and the case thumbnail.
  */
 export async function GET(_req: Request, { params }: Params) {
   const userId = await currentUserId();
