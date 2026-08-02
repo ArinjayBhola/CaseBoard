@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
           console.warn("[auth] could not record session:", err);
         }
 
-        return { id: user.id, email: user.email, name: user.username || user.email.split("@")[0], sessionId };
+        return { id: user.id, email: user.email, name: user.username || user.email.split("@")[0], image: user.imageUrl, sessionId };
       },
     }),
   ],
@@ -90,9 +90,10 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.uid;
         const user = await prisma.user.findUnique({
           where: { id: token.uid },
-          select: { username: true },
+          select: { username: true, imageUrl: true },
         });
         session.user.name = user?.username || session.user.name || "Account";
+        session.user.image = user?.imageUrl;
       }
       session.sessionId = token.sid;
       return session;

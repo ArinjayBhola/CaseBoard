@@ -13,6 +13,7 @@ model User {
   /// Name shown to other people in the app. Empty for accounts created before
   /// usernames were introduced; the UI falls back to the email prefix there.
   username    String       @default("")
+  imageUrl    String?
   password    String
   /// Cases this user created.
   cases       Case[]

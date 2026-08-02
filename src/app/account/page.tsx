@@ -9,6 +9,7 @@ import { TopBar } from "@/components/TopBar";
 import { Avatar } from "@/components/ui/Avatar";
 import { ArrowLeftIcon } from "@/components/ui/icons";
 import { UsernameEditor } from "@/components/UsernameEditor";
+import { ProfilePhotoEditor } from "@/components/ProfilePhotoEditor";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -26,6 +27,7 @@ export default async function AccountPage() {
     select: {
       email: true,
       username: true,
+      imageUrl: true,
       createdAt: true,
       _count: { select: { cases: true, memberships: true } },
     },
@@ -35,7 +37,7 @@ export default async function AccountPage() {
 
   return (
     <div className="min-h-[100dvh]">
-      <TopBar email={session.user.email} username={name} />
+      <TopBar email={session.user.email} username={name} imageUrl={user?.imageUrl} />
 
       <main id="main" className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
         <Link
@@ -48,9 +50,10 @@ export default async function AccountPage() {
 
         {/* Identity header, so the page opens with who you are rather than a form. */}
         <section className="surface mt-4 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-          <Avatar name={name} size="xl" />
+          <Avatar name={name} src={user?.imageUrl} size="xl" />
           <div className="min-w-0">
             <UsernameEditor initialUsername={name} />
+            <ProfilePhotoEditor imageUrl={user?.imageUrl} />
             <p className="mt-0.5 truncate text-sm text-stone-500">{user?.email}</p>
             <p className="mt-2 text-xs text-stone-500">
               Member since {user ? formatDate(user.createdAt) : "—"}

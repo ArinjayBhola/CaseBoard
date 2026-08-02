@@ -3,7 +3,7 @@ import { badRequest } from "@/server/errors";
 import { json, withUser } from "@/server/http";
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"]);
 
 export async function POST(req: Request) {
   return withUser(async (userId) => {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     if (!file || typeof file === "string") throw badRequest("No file uploaded");
     if (!ALLOWED.has(file.type)) {
-      throw badRequest("Photo must be a JPEG, PNG, WebP, or GIF image");
+      throw badRequest("File must be a JPEG, PNG, WebP, GIF image, or PDF");
     }
     if (file.size > MAX_BYTES) throw badRequest("Photo must be under 5 MB");
 
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       filename: file.name || "upload",
       contentType: file.type,
       // Keys are namespaced by owner so /api/files can authorise by prefix.
-      prefix: userKeyPrefix(userId),
+      prefix: userKeyPrefix(userId, form?.get("scope") === "profile" ? "profile" : "people"),
     });
 
     return json(result, 201);

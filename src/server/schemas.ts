@@ -11,6 +11,7 @@ export const signupSchema = z.object({
   password: z
     .string()
     .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`),
+  imageUrl: z.string().max(1000).optional().nullable(),
 });
 
 export const updateUsernameSchema = z.object({
@@ -19,6 +20,11 @@ export const updateUsernameSchema = z.object({
     .trim()
     .min(1, "Enter a username")
     .max(50, "Username must be 50 characters or fewer"),
+});
+
+export const updateProfileSchema = z.object({
+  username: updateUsernameSchema.shape.username.optional(),
+  imageUrl: z.string().max(1000).nullable().optional(),
 });
 
 export const changePasswordSchema = z.object({

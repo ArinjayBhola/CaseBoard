@@ -1,4 +1,5 @@
 import { LocalDiskStorage } from "./local";
+import { R2Storage } from "./r2";
 import type { Storage } from "./types";
 
 export type { Storage, PutInput, PutResult, GetResult } from "./types";
@@ -7,8 +8,8 @@ export type { Storage, PutInput, PutResult, GetResult } from "./types";
  * Every uploaded key lives under its owner's prefix, so serving and importing
  * can authorise on the key alone without a database lookup.
  */
-export function userKeyPrefix(userId: string) {
-  return `users/${userId}/people`;
+export function userKeyPrefix(userId: string, area = "people") {
+  return `users/${userId}/${area}`;
 }
 
 /** True when `url` points at a file this user uploaded. */
@@ -33,6 +34,9 @@ export function storage(): Storage {
   switch (driver) {
     case "local":
       instance = new LocalDiskStorage();
+      break;
+    case "r2":
+      instance = new R2Storage();
       break;
     default:
       throw new Error(`Unknown STORAGE_DRIVER: ${driver}`);

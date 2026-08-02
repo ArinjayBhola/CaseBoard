@@ -33,8 +33,12 @@ The board does not sync without the realtime server; calls need LiveKit.
    DATABASE_URL="postgresql://...@....neon.tech/neondb?sslmode=require"
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="<random 32-byte base64 string>"
-   STORAGE_DRIVER="local"
-   LOCAL_UPLOAD_DIR="./uploads"
+   STORAGE_DRIVER="r2"
+   R2_ACCOUNT_ID="your-cloudflare-account-id"
+   R2_ACCESS_KEY_ID="your-r2-access-key"
+   R2_SECRET_ACCESS_KEY="your-r2-secret-key"
+   R2_BUCKET="caseboard"
+   R2_PUBLIC_URL="https://cdn.example.com"
    ```
 
    Generate a secret with `openssl rand -base64 32`, or in PowerShell:
@@ -117,12 +121,13 @@ Moving to Express means:
 3. Point the frontend at it by setting `NEXT_PUBLIC_API_BASE` — `src/lib/api.ts`
    already prefixes every request with it, so no component changes.
 
-### Swapping local disk for R2
+### Cloudflare R2 storage
 
-`src/lib/storage/types.ts` defines the `Storage` interface. Add `R2Storage`
-implementing it, register it in the `switch` in `src/lib/storage/index.ts`, and set
-`STORAGE_DRIVER=r2`. Nothing that uploads or deletes files changes — `put()` just
-starts returning CDN URLs instead of `/api/files/...` ones.
+Uploads use `src/lib/storage/r2.ts` when `STORAGE_DRIVER=r2`. Configure an R2
+bucket and a public custom domain (or R2.dev URL) in the environment above. Image
+and PDF uploads are stored under owner-scoped keys, and returned URLs are the
+configured public URL. Set `STORAGE_DRIVER=local` with `LOCAL_UPLOAD_DIR` only for
+local development without R2.
 
 Photos are stored outside `public/`, so `/api/files/[...key]` serves them and
 requires a session.

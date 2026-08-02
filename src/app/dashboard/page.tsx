@@ -20,7 +20,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-[100dvh]">
-      <TopBar email={session!.user.email} username={session!.user.name} />
+      <TopBar email={session!.user.email} username={session!.user.name} imageUrl={session!.user.image} />
       <main id="main" className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         <CaseList initialCases={initial} />
       </main>

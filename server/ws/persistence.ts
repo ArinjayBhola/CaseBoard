@@ -11,6 +11,7 @@ import {
 } from "../../src/lib/realtime/boardDoc";
 import { asConfidence, asDirection } from "../../src/lib/realtime/entities";
 import { prisma } from "./prisma";
+import { storage } from "../../src/lib/storage";
 
 /**
  * Postgres is a periodic snapshot of the Yjs state, not the live write path.
@@ -327,24 +328,12 @@ async function projectBoardToTables(doc: Y.Doc, caseId: string) {
   await deleteOrphanPhotos(doomed.map((p) => p.photoUrl));
 }
 
-/** Local-disk cleanup for photos whose person was deleted through Yjs. */
+/** Remove photos whose person was deleted through Yjs, regardless of driver. */
 async function deleteOrphanPhotos(urls: (string | null)[]) {
-  const { unlink } = await import("node:fs/promises");
-  const path = await import("node:path");
-
-  const root = path.resolve(process.cwd(), process.env.LOCAL_UPLOAD_DIR ?? "./uploads");
-
   for (const url of urls) {
-    if (!url?.startsWith("/api/files/")) continue;
-    const key = url.slice("/api/files/".length);
-    const full = path.resolve(root, key);
-    // Refuse anything that escapes the upload root.
-    if (full !== root && !full.startsWith(root + path.sep)) continue;
-    try {
-      await unlink(full);
-    } catch {
-      // Already gone.
-    }
+    if (!url) continue;
+    const key = storage().keyFromUrl(url);
+    if (key) await storage().delete(key);
   }
 }
 

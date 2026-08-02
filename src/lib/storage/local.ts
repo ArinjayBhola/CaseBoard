@@ -16,6 +16,7 @@ const TYPE_BY_EXT: Record<string, string> = {
   ".png": "image/png",
   ".webp": "image/webp",
   ".gif": "image/gif",
+  ".pdf": "application/pdf",
 };
 
 /** URL prefix served by src/app/api/files/[...key]/route.ts */
