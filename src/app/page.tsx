@@ -118,12 +118,12 @@ function BoardPreview() {
   return (
     <div className="relative mx-auto w-full max-w-xl animate-slide-up delay-100">
       <div className="absolute -inset-5 -z-10 rounded-[2rem] bg-terracotta-500/5" aria-hidden="true" />
-      <div className="overflow-hidden rounded-2xl border border-cream-300 bg-cream-50 shadow-panel">
+      <div className="overflow-hidden rounded-xl border border-cream-300 bg-cream-50 shadow-panel">
         <div className="flex h-12 items-center justify-between border-b border-cream-300 px-4">
           <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-terracotta-500" /><span className="text-xs font-semibold text-stone-700">Project Northstar</span></div>
           <div className="flex -space-x-1.5"><span className="h-6 w-6 rounded-full border-2 border-cream-50 bg-[#c4b5fd]" /><span className="h-6 w-6 rounded-full border-2 border-cream-50 bg-[#93c5fd]" /><span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-cream-50 bg-cream-200 text-[9px] font-semibold text-stone-500">+2</span></div>
         </div>
-        <div className="relative h-[360px] overflow-hidden bg-[#f8fafc] sm:h-[400px]">
+        <div className="relative h-[360px] overflow-hidden bg-cream-100 sm:h-[400px]">
           <div className="absolute inset-0 opacity-70" style={{ backgroundImage: "linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 560 400" fill="none" aria-hidden="true"><path d="M184 137 356 105M184 137l62 151M356 105 246 288M356 105l96 180M246 288l206-3" stroke="#94a3b8" strokeWidth="2" strokeDasharray="5 5" /></svg>
           <Node className="left-[22%] top-[24%]" color="bg-[#bfdbfe]" label="Maya Chen" detail="Lead researcher" />
@@ -139,5 +139,5 @@ function BoardPreview() {
 }
 
 function Node({ className, color, label, detail }: { className: string; color: string; label: string; detail: string }) {
-  return <div className={`absolute w-32 -translate-x-1/2 rounded-xl border border-cream-300 bg-cream-50 p-2.5 shadow-card sm:w-36 ${className}`}><div className="flex items-center gap-2"><span className={`h-7 w-7 shrink-0 rounded-lg ${color}`} /><span className="min-w-0"><span className="block truncate text-[11px] font-semibold text-stone-700">{label}</span><span className="block truncate text-[10px] text-stone-400">{detail}</span></span></div></div>;
+  return <div className={`absolute w-32 -translate-x-1/2 rounded-lg border border-cream-300 bg-cream-50 p-2.5 shadow-card sm:w-36 ${className}`}><div className="flex items-center gap-2"><span className={`h-7 w-7 shrink-0 rounded-md ${color}`} /><span className="min-w-0"><span className="block truncate text-[11px] font-semibold text-stone-700">{label}</span><span className="block truncate text-[10px] text-stone-400">{detail}</span></span></div></div>;
 }
